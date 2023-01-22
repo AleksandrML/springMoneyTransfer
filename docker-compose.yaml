@@ -1,0 +1,6 @@
+version: "0.0"
+services:
+  spring-authorization:
+    build: .
+    ports:
+      - "8080:8080"
