@@ -46,7 +46,7 @@ public class MoneyTransferService {
         } else throw new NotEnoughMoney("donate card does not have enough money to proceed");
     }
 
-    public void makeCheckedTransaction(CheckedTransaction transaction, String operationId) {
+    private void makeCheckedTransaction(CheckedTransaction transaction, String operationId) {
         double fee = transaction.getAmountToTransfer().getValue() * cardsRepository.getChargeCommission();
         double amountToDecrease = transaction.getAmountToTransfer().getValue() + fee;
         transaction.getDonateCard().decreaseAmount(amountToDecrease, transaction.getAmountToTransfer().getCurrency());

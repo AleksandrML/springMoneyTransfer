@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 
-//TODO tests
+//TODO tests: units (cardsData, moneyTransferService methods - think how with mock, at least 1 method) + docker file docker compose and docker integration test
 @RestController
 public class TransferController {
     MoneyTransferService moneyTransferService;
