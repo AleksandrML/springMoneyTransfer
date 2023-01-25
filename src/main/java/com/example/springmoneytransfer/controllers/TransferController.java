@@ -12,10 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 
-//TODO: logs, optimize code in cardsrepository (probably move part to services), tests
-//{"cardFromNumber": "5540000000000000", "cardFromValidTill": "12/25", "cardFromCVV": "330", "cardToNumber": "5530000000000000",
-//        "amount": {"value": 1000, "currency": "RUR"}}
-//        {"operationId": "0f851972-45d9-4bd1-a443-433e6b985f7c", "code": "0000"}
+//TODO tests
 @RestController
 public class TransferController {
     MoneyTransferService moneyTransferService;

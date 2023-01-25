@@ -1,11 +1,10 @@
 package com.example.springmoneytransfer.repositories;
 
 import com.example.springmoneytransfer.exceptions.CardIsNotValid;
-import com.example.springmoneytransfer.exceptions.NotEnoughMoney;
 import com.example.springmoneytransfer.exceptions.VerificationCodeIsNotCorrect;
+import com.example.springmoneytransfer.models.Amount;
 import com.example.springmoneytransfer.models.CardsData;
 import com.example.springmoneytransfer.models.CheckedTransaction;
-import com.example.springmoneytransfer.models.TransferRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
@@ -25,10 +24,32 @@ public class CardsRepository {
     // virtual db like
     private Map<String, CheckedTransaction> transactions = new HashMap<>(Map.of());
     private Map<String, String> verificationCodes = new HashMap<>(Map.of());
-    private double profit = 0;
+    private double profitUsdAccount = 0;
+    private double profitRurAccount = 0;
+    private double chargeCommission = 0.1;
 
     // some service has to generate verification code and send it to a client, but we do not have that, so we use hardcoded code:
     final private String verificationCode = "0000";
+
+    public double getProfitUsdAccount() {
+        return profitUsdAccount;
+    }
+
+    public double getProfitRurAccount() {
+        return profitRurAccount;
+    }
+
+    public double getChargeCommission() {
+        return chargeCommission;
+    }
+
+    public void setProfitUsdAccount(double profitUsdAccount) {
+        this.profitUsdAccount = profitUsdAccount;
+    }
+
+    public void setProfitRurAccount(double profitRurAccount) {
+        this.profitRurAccount = profitRurAccount;
+    }
 
     private boolean isValidCardFull(String cardNumber, String cvcCard, String validTill) {
         if (cardsDbLike.containsKey(cardNumber)) {
@@ -55,24 +76,9 @@ public class CardsRepository {
                                      String transferCurrency, Double transferAmount) {
         if (isValidCardFull(cardNumber, cvcCard, validTill)) {
             CardsData proceedCard = cardsDbLike.get(cardNumber);
-            return proceedCard.testDecreasingAmount(transferAmount * 1.1, transferCurrency) >= 0;
+            return proceedCard.testDecreasingAmount(transferAmount * (1 + chargeCommission), transferCurrency) >= 0;
         }
         else throw new CardIsNotValid("Donate card is not valid");
-    }
-
-    public String checkTransaction(TransferRequest transferRequest) {
-        String operationId = java.util.UUID.randomUUID().toString();
-        checkAcceptorCard(transferRequest.getCardToNumber());
-        if (checkDonateCard(
-                transferRequest.getCardFromNumber(), transferRequest.getCardFromCVV(),
-                transferRequest.getCardFromValidTill(), transferRequest.getAmount().getCurrency(),
-                (double) transferRequest.getAmount().getValue())) {
-            verificationCodes.put(operationId, verificationCode);
-            transactions.put(operationId,
-                    new CheckedTransaction(cardsDbLike.get(transferRequest.getCardFromNumber()),
-                            cardsDbLike.get(transferRequest.getCardToNumber()), transferRequest.getAmount()));
-            return operationId;
-        } else throw new NotEnoughMoney("donate card does not have enough money to proceed");
     }
 
     public CheckedTransaction getTransaction(String id, String verificationCode) {
@@ -84,16 +90,12 @@ public class CardsRepository {
         throw new VerificationCodeIsNotCorrect("there is no such transaction or code is wrong");
     }
 
-    public double makeCheckedRequest(CheckedTransaction transaction) {
-        double fee = transaction.getAmountToTransfer().getValue() * 0.1;
-        double amountToDecrease = transaction.getAmountToTransfer().getValue() + fee;
-        transaction.getDonateCard().decreaseAmount(amountToDecrease, transaction.getAmountToTransfer().getCurrency());
-        transaction.getAcceptorCard().increaseAmount(transaction.getAmountToTransfer().getValue(), transaction.getAmountToTransfer().getCurrency());
-        return fee;
+    public void generateVerificationCodeForOperation(String operationId) {
+        verificationCodes.put(operationId, verificationCode);
     }
 
-    public void increaseProfitFromFee(double fee) {
-        this.profit += fee;
+    public void addCheckedTransaction(String operationId, String cardFromNumber, String cardToNumber, Amount amount) {
+        transactions.put(operationId, new CheckedTransaction(cardsDbLike.get(cardFromNumber), cardsDbLike.get(cardToNumber), amount));
     }
 
 }
