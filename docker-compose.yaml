@@ -1,6 +1,6 @@
 version: "0.0"
 services:
-  spring-authorization:
+  money-transfer:
     build: .
     ports:
-      - "8080:8080"
+      - "5500:5500"
