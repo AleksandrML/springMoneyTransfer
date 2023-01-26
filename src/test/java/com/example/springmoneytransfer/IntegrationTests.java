@@ -20,6 +20,7 @@ class IntegrationTests {
 	@Autowired
 	TestRestTemplate restTemplate;
 
+	// one has to have previously built docker image locally from the project to run that test
 	private static final GenericContainer<?> container = new GenericContainer<>("money-transfer:latest")
 			.withExposedPorts(5500);
 	private final ObjectMapper objectMapper = new ObjectMapper();
