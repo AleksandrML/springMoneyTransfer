@@ -52,4 +52,25 @@ class IntegrationTests {
 		Assertions.assertEquals(expectedMessage, realMessage);
 	}
 
+	@Test
+	void testConfirm() throws JsonProcessingException {
+		//given
+		String requestJson = "{\"operationId\": \"no_existed_id\", \"code\": \"wrong_code\"}";
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
+
+		//expected
+		String expectedMessage = "\"there is no such transaction or code is wrong\"";
+
+		//when
+		ResponseEntity<String> response =
+				restTemplate.postForEntity("http://localhost:" + container.getMappedPort(5500) + "/confirmOperation", entity, String.class);
+		JsonNode root = objectMapper.readTree(response.getBody());
+		String realMessage = root.path("message").toString();
+
+		//then
+		Assertions.assertEquals(expectedMessage, realMessage);
+	}
+
 }
