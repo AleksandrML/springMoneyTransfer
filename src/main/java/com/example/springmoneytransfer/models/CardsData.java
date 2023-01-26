@@ -68,4 +68,8 @@ public class CardsData {
         return number;
     }
 
+    public double getAmount() {
+        return amount;
+    }
+
 }
