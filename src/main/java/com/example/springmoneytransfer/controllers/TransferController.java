@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 
-//TODO tests: units (moneyTransferService methods - think how with mock, at least 1 method)
+//TODO add readme, tests: units (moneyTransferService methods - think how with mock, at least 1 method)
 @RestController
 public class TransferController {
     MoneyTransferService moneyTransferService;
