@@ -29,7 +29,7 @@ public class MoneyTransferService {
         return new OperationResponse(confirmRequest.getOperationId());
     }
 
-    private String checkTransaction(TransferRequest transferRequest) {
+    public String checkTransaction(TransferRequest transferRequest) {
         String operationId = java.util.UUID.randomUUID().toString();
         cardsRepository.checkAcceptorCard(transferRequest.getCardToNumber());
         if (cardsRepository.checkDonateCard(

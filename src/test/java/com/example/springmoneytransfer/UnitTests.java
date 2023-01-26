@@ -1,9 +1,14 @@
 package com.example.springmoneytransfer;
 
+import com.example.springmoneytransfer.models.Amount;
 import com.example.springmoneytransfer.models.CardsData;
+import com.example.springmoneytransfer.models.TransferRequest;
+import com.example.springmoneytransfer.repositories.CardsRepository;
+import com.example.springmoneytransfer.services.MoneyTransferService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.Mockito;
 
 @SpringBootTest
 class UnitTests {
@@ -56,6 +61,34 @@ class UnitTests {
 
 		//then
 		Assertions.assertEquals(4000, localCard.getAmount());
+	}
+
+	@Test
+	void moneyTransferServiceCheckTransaction() {
+		//given
+		TransferRequest transferRequest = new TransferRequest();
+		transferRequest.setCardFromNumber("test");
+		transferRequest.setCardFromValidTill("test");
+		transferRequest.setCardFromCVV("test");
+		Amount amount = new Amount();
+		amount.setValue(10000);
+		amount.setCurrency("RUR");
+		transferRequest.setAmount(amount);
+		transferRequest.setCardToNumber("test");
+		CardsRepository cardsRepository = Mockito.mock(CardsRepository.class);
+		Mockito.when(cardsRepository.checkAcceptorCard(transferRequest.getCardToNumber())).thenReturn(true);
+		Mockito.when(cardsRepository.checkDonateCard(transferRequest.getCardFromNumber(), transferRequest.getCardFromCVV(),
+				transferRequest.getCardFromValidTill(), transferRequest.getAmount().getCurrency(),
+				(double) transferRequest.getAmount().getValue())).thenReturn(true);
+		MoneyTransferService moneyTransferService = new MoneyTransferService(cardsRepository);
+
+		int expectedIdLength = 36;
+
+		//when
+		String operationId = moneyTransferService.checkTransaction(transferRequest);
+
+		//then
+		Assertions.assertEquals(expectedIdLength, operationId.length());
 	}
 
 }

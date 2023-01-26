@@ -27,6 +27,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.testcontainers:junit-jupiter:1.15.1'
+	testImplementation 'org.mockito:mockito-core:3.5.11'
 }
 
 tasks.named('test') {
@@ -36,4 +37,3 @@ tasks.named('test') {
 jar {
 	enabled = false
 }
-
