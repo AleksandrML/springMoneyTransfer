@@ -1,14 +1,11 @@
 package com.example.springmoneytransfer.controllers;
 
-import com.example.springmoneytransfer.exceptions.CardIsNotValid;
-import com.example.springmoneytransfer.exceptions.NotEnoughMoney;
-import com.example.springmoneytransfer.exceptions.VerificationCodeIsNotCorrect;
 import com.example.springmoneytransfer.models.ConfirmRequest;
-import com.example.springmoneytransfer.models.ErrorCustomResponse;
 import com.example.springmoneytransfer.models.OperationResponse;
 import com.example.springmoneytransfer.models.TransferRequest;
 import com.example.springmoneytransfer.services.MoneyTransferService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -21,25 +18,13 @@ public class TransferController {
     }
 
     @PostMapping("/transfer")
-    public OperationResponse doTransfer(@RequestBody TransferRequest transferRequest) {
-        return moneyTransferService.beginTransferProcess(transferRequest);
+    public ResponseEntity<OperationResponse> doTransfer(@RequestBody TransferRequest transferRequest) {
+        return new ResponseEntity<>(moneyTransferService.beginTransferProcess(transferRequest), HttpStatus.OK);
     }
 
     @PostMapping("/confirmOperation")
-    public OperationResponse confirmTransfer(@RequestBody ConfirmRequest confirmRequest) {
-        return moneyTransferService.confirmAndFinishTransfer(confirmRequest);
-    }
-
-    @ExceptionHandler({CardIsNotValid.class, NotEnoughMoney.class, VerificationCodeIsNotCorrect.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorCustomResponse clientError(RuntimeException exception) {
-        return new ErrorCustomResponse(exception.getMessage(), 0);
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorCustomResponse serverError(RuntimeException exception) {
-        return new ErrorCustomResponse(exception.getMessage(), 1);
+    public ResponseEntity<OperationResponse> confirmTransfer(@RequestBody ConfirmRequest confirmRequest) {
+        return new ResponseEntity<>(moneyTransferService.confirmAndFinishTransfer(confirmRequest), HttpStatus.OK);
     }
 
 }
